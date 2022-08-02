@@ -14,6 +14,18 @@ class ResourcesController extends Controller
 {
     public function getData()
     {
+        $date_from=request()->has('date_from')?request()->get('date_from'):'01-01-2022';
+        $date_to=request()->has('date_to')?request()->get('date_to'):'31-12-2022';
+        $soato=request()->has('soato')?request()->get('soato'):17;
+        $columns=[
+           'total_employees',
+           'active_population',
+           'employees',
+           'average_populartion',
+           'unemployed',
+            'rate_unemployement',
+           'unactive_population',
+        ];
         // $response=DB::table('resources')
         // ->select('resources.*','soato_new.name_uz_cl as name','regions_new.name_uz_cl as region_name')
         // ->join('soato_new','soato_new.id','=','resources.soato_new_id')
@@ -57,18 +69,33 @@ class ResourcesController extends Controller
     //         } 
     //    }
     //     return $res;
-    if(!request()->has('soato'))
+
+    if($soato==17)
     {
         $response=DB::table('resources')
-        ->select('resources.*','soato_new.name_uz_cl as name','regions_new.name_uz_cl as region_name')
+        ->select([...$columns,'regions_new.name_uz_cl as structure','regions_new.soato as soato'])
         ->join('soato_new','soato_new.id','=','resources.soato_new_id')
         ->join('regions_new','regions_new.id','=','soato_new.region_id')
-        ->whereRaw('date>'.request()->get('date_from'))
+        ->whereDate('date','>',date('y-m-d',strtotime($date_from)))
+        ->whereDate('date','<',date('y-m-d',strtotime($date_to)))
         ->orderByDesc('date')
-        ->get()->groupBy('region_name');
-       return  $response;
+        ->get()->groupBy('structure')->map(function($group) use($columns) {
+            $new=$group->first();
+            foreach($new as $key=>$val)
+            {
+                if(in_array($key,$columns))
+                {
+                    $new->{$key}=$group->sum($key);
+                }
+            }
+            return $new;
+    });
+    
+    $response=$response->map(function($val,$key){
+        return $val;
+    });
+        return $response;
     }
-    return request()->all();
     }
     public function index()
     {

@@ -21,4 +21,5 @@ class Resource extends Model
         'unactive_population',
         'date'
     ];
+  
 }
