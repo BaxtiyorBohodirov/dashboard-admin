@@ -70,36 +70,85 @@ class ResourcesController extends Controller
     //    }
     //     return $res;
 
-    if($soato==17)
-    {
-        $response=DB::table('resources')
-        ->select([...$columns,'regions_new.name_uz_cl as structure','regions_new.soato as soato'])
-        ->join('soato_new','soato_new.id','=','resources.soato_new_id')
-        ->join('regions_new','regions_new.id','=','soato_new.region_id')
-        ->whereDate('date','>',date('y-m-d',strtotime($date_from)))
-        ->whereDate('date','<',date('y-m-d',strtotime($date_to)))
-        ->orderByDesc('date')
-        ->get()->groupBy('structure')->map(function($group) use($columns) {
-            $new=$group->first();
-            foreach($new as $key=>$val)
-            {
-                if(in_array($key,$columns))
+        if($soato==17)
+        {
+            $response=DB::table('resources')
+            ->select([...$columns,'regions_new.name_uz_cl as structure','regions_new.soato as soato'])
+            ->join('soato_new','soato_new.id','=','resources.soato_new_id')
+            ->join('regions_new','regions_new.id','=','soato_new.region_id')
+            ->whereDate('date','>',date('y-m-d',strtotime($date_from)))
+            ->whereDate('date','<',date('y-m-d',strtotime($date_to)))
+            ->orderByDesc('date')
+            ->get()->groupBy('structure')->map(function($group) use($columns) {
+                $new=$group->first();
+                foreach($new as $key=>$val)
                 {
-                    $new->{$key}=$group->sum($key);
+                    if(in_array($key,$columns))
+                    {
+                        $new->{$key}=$group->sum($key);
+                    }
                 }
-            }
-            return $new;
-    });
-    
-    $response=$response->map(function($val,$key){
-        return $val;
-    });
-        return $response;
-    }
-    }
-    public function index()
-    {
-        $response=DB::table('resources')->select('resources.*','soato_new.name_uz_cl as name')->join('soato_new','soato_new.id','=','resources.soato_new_id')->get()->groupBy('name');
-        return $response;
+                return $new;
+            });
+        
+            $response=$response->map(function($val,$key){
+                return $val;
+            });
+            return $response;
+        }
+        else if(strlen((string)$soato)===4)
+        {
+            $region_id=DB::table('regions_new')->where('soato','=',$soato)->first()->id;
+            return $region_id;
+            $response=DB::table('resources')
+            ->select([...$columns,'soato_new.soato as soato','soato_new.name_uz_cl as structure'])
+            ->join('soato_new','soato_new.id','=','resources.soato_new_id')
+            ->where('soato_new.region_id','=',$region_id)
+            ->whereDate('date','>',date('y-m-d',strtotime($date_from)))
+            ->whereDate('date','<',date('y-m-d',strtotime($date_to)))
+            ->orderByDesc('date')
+            ->get()->groupBy('structure')->map(function($group) use($columns) {
+                $new=$group->first();
+                foreach($new as $key=>$val)
+                {
+                    if(in_array($key,$columns))
+                    {
+                        $new->{$key}=$group->sum($key);
+                    }
+                }
+                return $new;
+            });
+        
+            $response=$response->map(function($val,$key){
+                return $val;
+            });
+            return $response;
+        }
+        else if(strlen((string)$soato)===7)
+        {
+            $response=DB::table('resources')
+            ->select([...$columns,'soato_new.soato as soato','soato_new.name_uz_cl as structure'])
+            ->join('soato_new','soato_new.id','=','resources.soato_new_id')
+            ->where('soato_new.soato','=',$soato)
+            ->whereDate('date','>',date('y-m-d',strtotime($date_from)))
+            ->whereDate('date','<',date('y-m-d',strtotime($date_to)))
+            ->orderByDesc('date')
+            ->get()->groupBy('structure')->map(function($group) use($columns) {
+                $new=$group->first();
+                foreach($new as $key=>$val)
+                {
+                    if(in_array($key,$columns))
+                    {
+                        $new->{$key}=$group->sum($key);
+                    }
+                }
+                return $new;
+            });
+        
+            $response=$response->map(function($val,$key){
+                return $val;
+            });
+            return $response;
+        }
     }
 }

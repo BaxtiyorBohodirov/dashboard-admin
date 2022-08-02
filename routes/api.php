@@ -21,11 +21,6 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 Route::get('/v1/labor-resources',[ResourcesController::class,'getData']);
+Route::get('/v1/employment',[EmploymentController::class,'getData']);
+Route::get('/v1/professional-training',[TrainingController::class,'getData']);
 
-Route::get('/employment/republic',[EmploymentController::class,'getRepublic']);
-Route::get('/employment/region/{soato}',[EmploymentController::class,'getRegion']);
-Route::get('/employment/district/{soato}',[EmploymentController::class,'getDistrict']);
-
-Route::get('/training/republic',[TrainingController::class,'getRepublic']);
-Route::get('/training/region/{soato}',[TrainingController::class,'getRegion']);
-Route::get('/training/district/{soato}',[TrainingController::class,'getDistrict']);
