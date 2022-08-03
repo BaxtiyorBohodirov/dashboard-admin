@@ -50,7 +50,7 @@ class EmploymentController extends Controller
         else if(strlen((string)$soato)===4)
         {
             $region_id=DB::table('regions_new')->where('soato','=',$soato)->first()->id;
-            return $region_id;
+            // return $region_id;
             $response=DB::table('employment')
             ->select([...$columns,'soato_new.soato as soato','soato_new.name_uz_cl as structure'])
             ->join('soato_new','soato_new.id','=','employment.soato_new_id')
@@ -80,7 +80,7 @@ class EmploymentController extends Controller
             $response=DB::table('employment')
             ->select([...$columns,'soato_new.soato as soato','soato_new.name_uz_cl as structure'])
             ->join('soato_new','soato_new.id','=','employment.soato_new_id')
-            ->where('soato_new.soto','=',$soato)
+            ->where('soato_new.soato','=',$soato)
             ->whereDate('date','>',date('y-m-d',strtotime($date_from)))
             ->whereDate('date','<',date('y-m-d',strtotime($date_to)))
             ->orderByDesc('date')

@@ -52,7 +52,6 @@ class TrainingController extends Controller
         else if(strlen((string)$soato)===4)
         {
             $region_id=DB::table('regions_new')->where('soato','=',$soato)->first()->id;
-            return $region_id;
             $response=DB::table('vocational_training')
             ->select([...$columns,'soato_new.soato as soato','soato_new.name_uz_cl as structure'])
             ->join('soato_new','soato_new.id','=','vocational_training.soato_new_id')

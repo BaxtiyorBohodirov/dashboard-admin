@@ -99,7 +99,7 @@ class ResourcesController extends Controller
         else if(strlen((string)$soato)===4)
         {
             $region_id=DB::table('regions_new')->where('soato','=',$soato)->first()->id;
-            return $region_id;
+            // return $region_id;
             $response=DB::table('resources')
             ->select([...$columns,'soato_new.soato as soato','soato_new.name_uz_cl as structure'])
             ->join('soato_new','soato_new.id','=','resources.soato_new_id')
